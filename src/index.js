@@ -34,7 +34,6 @@ const SiderDemo = () => {
 
   const toggle = () => {  setCollapsed(!collapsed)  };
   
-
     return (
       <Router>
       <Layout>
