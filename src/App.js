@@ -1,5 +1,5 @@
 import "./App.css";
-import { Layout, Avatar, Menu, Breadcrumb } from "antd";
+import { Divider, Layout, Avatar, Menu, Breadcrumb } from "antd";
 import { WalletOutlined } from "@ant-design/icons";
 import Title from "antd/lib/typography/Title";
 import SubMenu from "antd/lib/menu/SubMenu";
@@ -58,7 +58,9 @@ function App() {
               {/* <AddWalletForm /> */}
               <div style={{ background: "#fff", padding: 24, minHeight: 580 }}>
                 {/* <WalletsMetric /> */}
+                <Divider orientation="center">Current Statistics</Divider>
                 <MetricsContainer />
+                <Divider orientation="center">Trends</Divider>
                 <HashChart title="Hashrate" dataType="hash" />
                 <HashChart title="Workers" dataType="workers" />
                 <WalletList />
