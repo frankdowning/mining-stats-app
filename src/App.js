@@ -1,79 +1,51 @@
-import "./App.css";
-import { Divider, Layout, Avatar, Menu, Breadcrumb } from "antd";
-import { WalletOutlined } from "@ant-design/icons";
-import Title from "antd/lib/typography/Title";
-import SubMenu from "antd/lib/menu/SubMenu";
-import WalletsMetric from "./components/WalletsMetric";
-import AddWalletForm from "./components/AddWalletForm";
-import WalletList from "./components/WalletList";
-import HashChart from "./components/charts/HashChart";
-import MetricsContainer from "./components/charts/MetricsContainer";
-
-const { Header, Footer, Sider, Content } = Layout;
-
-function App() {
+import React, { useState, useEffect } from "react";
+import {
+  Switch,
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import Spinner from "react-bootstrap/Spinner";
+import { UserContext } from "./context/UserContext";
+import { checkUser } from "./services/magic";
+import Authenticate from "./components/Authenticate";
+import Dashboard from "./components/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
+const App = () => {
+  const [user, setUser] = useState({ isLoggedIn: null, email: "" });
+  const [loading, setLoading] = useState();
+  useEffect(() => {
+    const validateUser = async () => {
+      setLoading(true);
+      try {
+        await checkUser(setUser);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    validateUser();
+  }, [user.isLoggedIn]);
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
+        <Spinner animation="border" />
+      </div>
+    );
+  }
   return (
-    <div className="App">
-      <Layout>
-        <Header style={{ padding: 15 }}>
-          <Avatar style={{ float: "right" }} src="./eth-logo.svg" />
-          <Title style={{ color: "white" }} level={3}>
-            Mining Stats
-          </Title>
-        </Header>
-        <Layout>
-          <Sider
-            breakpoint="lg"
-            collapsedWidth="0"
-            onBreakpoint={(broken) => {
-              console.log(broken);
-            }}
-            onCollapse={(collapsed, type) => {
-              console.log(collapsed, type);
-            }}
-          >
-            <Menu defaultSelectedKeys={["Overview"]} mode="inline">
-              <Menu.Item key="Overview">Overview</Menu.Item>
-              <SubMenu
-                title={
-                  <span>
-                    <WalletOutlined />
-                    <span>Addresses</span>
-                  </span>
-                }
-              >
-                <Menu.ItemGroup key="Addressses">
-                  <Menu.Item key="Wallet1">Wallet 1</Menu.Item>
-                  <Menu.Item key="Wallet2">Wallet 2</Menu.Item>
-                </Menu.ItemGroup>
-              </SubMenu>
-            </Menu>
-          </Sider>
-          <Layout>
-            <Content style={{ padding: "0 10px" }}>
-              <Breadcrumb style={{ margin: "12px 0" }}>
-                <Breadcrumb.Item>Home</Breadcrumb.Item>
-                <Breadcrumb.Item>Overview</Breadcrumb.Item>
-              </Breadcrumb>
-              {/* <AddWalletForm /> */}
-              <div style={{ background: "#fff", padding: 24, minHeight: 580 }}>
-                {/* <WalletsMetric /> */}
-                <Divider orientation="center">Current Statistics</Divider>
-                <MetricsContainer />
-                <Divider orientation="center">Trends</Divider>
-                <HashChart title="Hashrate" dataType="hash" />
-                <HashChart title="Workers" dataType="workers" />
-                <WalletList />
-              </div>
-            </Content>
-            <Footer style={{ textAlign: "center" }}>
-              Donation Address: XXXXXX
-            </Footer>
-          </Layout>
-        </Layout>
-      </Layout>
-    </div>
+    <UserContext.Provider value={user}>
+      <Router>
+        {user.isLoggedIn && <Redirect to={{ pathname: "/dashboard" }} />}
+        <Switch>
+          <Route exact path="/" component={Authenticate} />
+          <PrivateRoute path="/dashboard" component={Dashboard} />
+        </Switch>
+      </Router>
+    </UserContext.Provider>
   );
-}
-
+};
 export default App;

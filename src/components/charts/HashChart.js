@@ -6,7 +6,8 @@ import fetchData from "../../api/fetchData.js";
 
 function HashChart(props) {
   const [chartOptions, setChartOptions] = useState({
-    title: { text: props.title },
+    // title: { text: props.title },
+    title: { text: "" },
     chart: { type: "spline" },
     xAxis: {
       type: "datetime",
